@@ -1,17 +1,17 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Roblox Chase 3D", page_icon="🎮", layout="wide")
+st.set_page_config(page_title="Roblox Duo Chase 3D", page_icon="🎮", layout="wide")
 
 st.markdown("""
     <style>
         .stApp { background-color: #080c14; color: white; }
         .main .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 95%; }
-        h1 { text-align: center; color: #ff007f; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 10px rgba(255,0,127,0.5); }
+        h1 { text-align: center; color: #ff6584; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 10px rgba(255,101,132,0.5); }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🎮 ROBLOX NOOB VS MUSCLE CHASE 3D")
+st.title("🎮 ROBLOX DUO: CHASE & ESCAPE 3D")
 st.markdown("<p style='text-align: center; font-size: 16px;'>Điều khiển: <b>[A / D]</b> hoặc <b>[Mũi tên Trái / Phải]</b> đổi làn | <b>[Space / W]</b> Nhảy | <b>[S]</b> Cúi | <b>[R]</b> Chơi lại</p>", unsafe_allow_html=True)
 
 game_code = """
@@ -19,7 +19,7 @@ game_code = """
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox Chase Game</title>
+    <title>Roblox Duo Chase Game</title>
     <style>
         body {
             margin: 0;
@@ -34,10 +34,10 @@ game_code = """
         }
         #game-container {
             position: relative;
-            box-shadow: 0 0 35px rgba(255, 0, 127, 0.3);
+            box-shadow: 0 0 35px rgba(255, 101, 132, 0.3);
             border-radius: 16px;
             overflow: hidden;
-            border: 3px solid #ff007f;
+            border: 3px solid #ff6584;
         }
         canvas {
             display: block;
@@ -53,15 +53,6 @@ game_code = """
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-
-        // --- TẢI HÌNH ẢNH NHÂN VẬT THỰC TẾ ---
-        // 1. Ảnh người chạy: Roblox Noob (Render trực tiếp từ link icon avatar Roblox)
-        const runnerImg = new Image();
-        runnerImg.src = "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-311D7C2C0EDC956C82F24E68B8D4E302-Png/150/150/AvatarHeadshot/Png/noFilter";
-
-        // 2. Ảnh người đuổi: Anh chàng cơ bắp xăm trổ (Từ hình ảnh bạn cung cấp)
-        const chaserImg = new Image();
-        chaserImg.src = "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=300&auto=format&fit=crop&q=80";
 
         function getLaneX(lane, y) {
             let topCenterX = 400;
@@ -85,7 +76,7 @@ game_code = """
         let player = {
             lane: 1,
             y: 470,
-            width: 50,
+            width: 48,
             height: 75,
             vy: 0,
             jumping: false,
@@ -96,8 +87,8 @@ game_code = """
         let chaser = {
             lane: 1,
             y: 530,
-            width: 85,
-            height: 105
+            width: 55,
+            height: 85
         };
 
         let obstacles = [];
@@ -225,8 +216,8 @@ game_code = """
 
             // BẦU TRỜI
             let skyGradient = ctx.createLinearGradient(0, 0, 0, 140);
-            skyGradient.addColorStop(0, '#10002b');
-            skyGradient.addColorStop(1, '#3c096c');
+            skyGradient.addColorStop(0, '#2b0938');
+            skyGradient.addColorStop(1, '#190324');
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, 800, 140);
 
@@ -244,7 +235,7 @@ game_code = """
             ctx.closePath();
             ctx.fill();
 
-            ctx.strokeStyle = '#ff007f';
+            ctx.strokeStyle = '#ff6584';
             ctx.lineWidth = 4;
             ctx.beginPath();
             ctx.moveTo(400 - 70, 140); ctx.lineTo(400 - 260, 600);
@@ -269,7 +260,7 @@ game_code = """
                 let leftX = 400 - 90 - progress * 240;
                 let rightX = 400 + 90 + progress * 240;
 
-                ctx.fillStyle = '#240046';
+                ctx.fillStyle = '#3a0ca3';
                 ctx.beginPath();
                 ctx.arc(leftX, y - 20 * scale, 35 * scale, 0, Math.PI * 2);
                 ctx.arc(rightX, y - 20 * scale, 35 * scale, 0, Math.PI * 2);
@@ -309,69 +300,48 @@ game_code = """
                 }
             });
 
-            // --- VẼ HÌNH ẢNH NHÂN VẬT CHẠY (ROBLOX NOOB) ---
+            // --- 1. NHÂN VẬT CHẠY TRỐN (NHÂN VẬT NỮ TÓC ĐEN NƠ HỒNG, TRANG PHỤC TRẮNG HỒNG) ---
             let pX = getLaneX(player.lane, player.y);
-            let pW = 48 * (player.y / 600);
-            let pH = (player.crouching ? 40 : player.height) * (player.y / 600);
-            let pYDraw = player.crouching ? player.y + 25 : player.y;
+            let pW = 45 * (player.y / 600);
+            let pH = (player.crouching ? 35 : player.height) * (player.y / 600);
+            let pYDraw = player.crouching ? player.y + 20 : player.y;
 
-            if (runnerImg.complete) {
-                ctx.drawImage(runnerImg, pX - pW / 2, pYDraw - pH, pW, pH);
-            }
+            // Thân áo trắng viền hồng
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(pX - pW / 2, pYDraw - pH + 18, pW, pH - 38);
+            ctx.strokeStyle = '#ffb3c6';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pX - pW / 2, pYDraw - pH + 18, pW, pH - 38);
 
-            // --- VẼ HÌNH ẢNH NGƯỜI ĐUỔI (ANH CHÀNG CƠ BẮP XĂM TRỔ) ---
+            // Quần trắng
+            ctx.fillRect(pX - pW / 2, pYDraw - 20, pW, 20);
+
+            // Tóc đen dài & Nơ hồng xinh xắn trên đầu
+            ctx.fillStyle = '#111111';
+            ctx.beginPath();
+            ctx.arc(pX, pYDraw - pH - 10, 15, 0, Math.PI * 2);
+            ctx.fill();
+            // Nơ hồng
+            ctx.fillStyle = '#ff758c';
+            ctx.beginPath();
+            ctx.arc(pX - 8, pYDraw - pH - 24, 6, 0, Math.PI * 2);
+            ctx.arc(pX + 8, pYDraw - pH - 24, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillRect(pX - 4, pYDraw - pH - 27, 8, 6);
+
+
+            // --- 2. NGƯỜI ĐUỔI PHÍA SAU (NHÂN VẬT NAM PHONG CÁCH ĐEN - TRẮNG NGẦU) ---
             let cX = getLaneX(chaser.lane, chaser.y);
             let cW = chaser.width * (chaser.y / 600);
             let cH = chaser.height * (chaser.y / 600);
 
-            if (chaserImg.complete) {
-                ctx.drawImage(chaserImg, cX - cW / 2, chaser.y - cH, cW, cH);
-            }
-
-            // BẢNG ĐIỂM HUD
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            ctx.roundRect(15, 15, 190, 80, 10);
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.beginPath();
+            ctx.ellipse(cX, chaser.y + 5, cW / 2, 10, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 18px "Segoe UI", Arial';
-            ctx.fillText('SCORE: ' + score, 30, 45);
-            ctx.fillStyle = '#ffcc00';
-            ctx.fillText('COINS: 🪙 ' + coinCount, 30, 75);
-
-            // MÀN HÌNH GAME OVER
-            if (gameOver) {
-                ctx.fillStyle = 'rgba(10, 15, 25, 0.9)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#ff007f';
-                ctx.font = 'bold 36px "Segoe UI", Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('ĐẠI CA ĐÃ BẮT ĐƯỢC NOOB! 💥', 400, 250);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '20px "Segoe UI", Arial';
-                ctx.fillText('Tổng điểm: ' + score + '  |  Coins: ' + coinCount + ' 🪙', 400, 310);
-                
-                ctx.fillStyle = '#ffcc00';
-                ctx.font = 'bold 18px "Segoe UI", Arial';
-                ctx.fillText('Nhấn phím [ R ] để chơi lại!', 400, 370);
-                ctx.textAlign = 'start';
-            }
-        }
-
-        function loop() {
-            update();
-            draw();
-            if (!gameOver) {
-                requestAnimationFrame(loop);
-            }
-        }
-
-        loop();
-    </script>
-</body>
-</html>
-"""
-
-components.html(game_code, height=640)
+            // Áo phối đen - trắng phong cách
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(cX - cW / 2, chaser.y - cH + 16, cW / 2, cH - 36);
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(cX, chaser.y - cH + 16, cW / 2, cH
