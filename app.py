@@ -274,4 +274,4 @@ game_code = """
                 let radius = Math.max(c.scale * 22, 3);
                 
                 ctx.fillStyle = '#ffcc00';
-                ctx.beginPath();
+                ctx.beginPath;
