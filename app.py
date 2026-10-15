@@ -1,26 +1,25 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Forest Chase Ultra 3D", page_icon="🌲", layout="wide")
+st.set_page_config(page_title="Roblox Forest Chase 3D", page_icon="🎮", layout="wide")
 
-# Tùy chỉnh CSS cho Streamlit tràn màn hình rộng tối đa
 st.markdown("""
     <style>
         .stApp { background-color: #080c14; color: white; }
         .main .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 95%; }
-        h1 { text-align: center; color: #4eff91; font-family: 'Segoe UI', Roboto, sans-serif; text-shadow: 0 0 10px rgba(78,255,145,0.5); }
+        h1 { text-align: center; color: #ff007f; font-family: 'Segoe UI', sans-serif; text-shadow: 0 0 10px rgba(255,0,127,0.5); }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🌲 FOREST CHASE ULTRA 3D")
-st.markdown("<p style='text-align: center; font-size: 16px;'>Điều khiển: <b>[A / D]</b> hoặc <b>[Mũi tên Trái / Phải]</b> đổi làn | <b>[Space / W]</b> Nhảy | <b>[S]</b> Cúi | <b>[R]</b> Chơi lại</p>", unsafe_allow_html=True)
+st.title("🎮 ROBLOX VS MUSCLE: FOREST CHASE 3D")
+st.markdown("<p style='text-align: center; font-size: 16px;'>Điều khiển Roblox Noob: <b>[A / D]</b> hoặc <b>[Mũi tên Trái / Phải]</b> đổi làn | <b>[Space / W]</b> Nhảy | <b>[S]</b> Cúi | <b>[R]</b> Chơi lại</p>", unsafe_allow_html=True)
 
 game_code = """
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Forest Chase Ultra</title>
+    <title>Roblox Forest Chase</title>
     <style>
         body {
             margin: 0;
@@ -35,10 +34,10 @@ game_code = """
         }
         #game-container {
             position: relative;
-            box-shadow: 0 0 35px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 35px rgba(255, 0, 127, 0.3);
             border-radius: 16px;
             overflow: hidden;
-            border: 3px solid #2d6a4f;
+            border: 3px solid #ff007f;
         }
         canvas {
             display: block;
@@ -55,12 +54,7 @@ game_code = """
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // --- TẢI HÌNH ẢNH ĐỒ HỌA CHẤT LƯỢNG CAO ---
-        // Người đuổi: Đại ca cơ bắp xăm trổ
-        const chaserImg = new Image();
-        chaserImg.src = "https://img.icons8.com/emoji/96/man-lifting-weights.png"; // Icon cơ bắp đại diện
-
-        // Tọa độ 3 làn đường theo góc nhìn phối cảnh (Perspective 3D)
+        // Tọa độ 3 làn đường theo phối cảnh 3D
         function getLaneX(lane, y) {
             let topCenterX = 400;
             let bottomCenterX = 400;
@@ -172,3 +166,112 @@ game_code = """
             chaser.lane = currentLane;
 
             if (player.jumping) {
+                player.y += player.vy;
+                player.vy += 0.9;
+                if (player.y >= 470) {
+                    player.y = 470;
+                    player.jumping = false;
+                }
+            }
+
+            if (player.crouching) {
+                player.crouchTimer--;
+                if (player.crouchTimer <= 0) player.crouching = false;
+            }
+
+            score += 1;
+            if (frameCount % 200 === 0) speed += 0.4;
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.scale += 0.018 * (speed / 5);
+                obs.y = 140 + (600 - 140) * obs.scale;
+
+                if (obs.scale > 0.72 && obs.scale < 0.95 && obs.lane === player.lane) {
+                    if (!(obs.type === "barrier" && player.jumping && player.y < 410)) {
+                        gameOver = true;
+                    }
+                }
+
+                if (obs.scale > 1.05) obstacles.splice(i, 1);
+            }
+
+            for (let i = coins.length - 1; i >= 0; i--) {
+                let c = coins[i];
+                c.scale += 0.018 * (speed / 5);
+                c.y = 140 + (600 - 140) * c.scale;
+
+                if (c.scale > 0.75 && c.scale < 0.95 && c.lane === player.lane) {
+                    coinCount++;
+                    coins.splice(i, 1);
+                } else if (c.scale > 1.05) {
+                    coins.splice(i, 1);
+                }
+            }
+
+            spawnObjects();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. BẦU TRỜI & NỀN
+            let skyGradient = ctx.createLinearGradient(0, 0, 0, 140);
+            skyGradient.addColorStop(0, '#10002b');
+            skyGradient.addColorStop(1, '#3c096c');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, 800, 140);
+
+            // 2. CON ĐƯỜNG PHỐI CẢNH 3D XUYÊN RỪNG
+            let roadGradient = ctx.createLinearGradient(0, 140, 0, 600);
+            roadGradient.addColorStop(0, '#2b303a');
+            roadGradient.addColorStop(1, '#16191f');
+            
+            ctx.fillStyle = roadGradient;
+            ctx.beginPath();
+            ctx.moveTo(400 - 70, 140);
+            ctx.lineTo(400 + 70, 140);
+            ctx.lineTo(400 + 260, 600);
+            ctx.lineTo(400 - 260, 600);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#ff007f';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(400 - 70, 140); ctx.lineTo(400 - 260, 600);
+            ctx.moveTo(400 + 70, 140); ctx.lineTo(400 + 260, 600);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 20]);
+            ctx.lineDashOffset = -frameCount * speed * 0.8;
+            ctx.beginPath();
+            ctx.moveTo(400, 140); ctx.lineTo(400, 600);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 3. CÂY RỪNG HỆ THỐNG
+            for (let i = 0; i < 8; i++) {
+                let progress = ((frameCount * 3 + i * 70) % 460) / 460;
+                let y = 140 + progress * 460;
+                let scale = 0.2 + progress * 1.2;
+
+                let leftX = 400 - 90 - progress * 240;
+                let rightX = 400 + 90 + progress * 240;
+
+                ctx.fillStyle = '#240046';
+                ctx.beginPath();
+                ctx.arc(leftX, y - 20 * scale, 35 * scale, 0, Math.PI * 2);
+                ctx.arc(rightX, y - 20 * scale, 35 * scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 4. TIỀN XU ROBLOX (Tuxedo Coins)
+            coins.forEach(c => {
+                let x = getLaneX(c.lane, c.y);
+                let radius = Math.max(c.scale * 22, 3);
+                
+                ctx.fillStyle = '#ffcc00';
+                ctx.beginPath();
