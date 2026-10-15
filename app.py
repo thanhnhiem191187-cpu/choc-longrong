@@ -14,7 +14,7 @@ st.markdown("""
 st.title("🎮 ROBLOX VS MUSCLE: FOREST CHASE 3D")
 st.markdown("<p style='text-align: center; font-size: 16px;'>Điều khiển Roblox Noob: <b>[A / D]</b> hoặc <b>[Mũi tên Trái / Phải]</b> đổi làn | <b>[Space / W]</b> Nhảy | <b>[S]</b> Cúi | <b>[R]</b> Chơi lại</p>", unsafe_allow_html=True)
 
-game_code = """
+game_code = ""
 <!DOCTYPE html>
 <html lang="vi">
 <head>
