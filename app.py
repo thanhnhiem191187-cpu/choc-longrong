@@ -300,7 +300,7 @@ game_code = """
                 }
             });
 
-            // --- 1. NHÂN VẬT CHẠY TRỐN (NHÂN VẬT NỮ TÓC ĐEN NƠ HỒNG, TRANG PHỤC TRẮNG HỒNG) ---
+            // --- 1. NHÂN VẬT CHẠY (NỮ TÓC ĐEN NƠ HỒNG, TRANG PHỤC TRẮNG HỒNG) ---
             let pX = getLaneX(player.lane, player.y);
             let pW = 45 * (player.y / 600);
             let pH = (player.crouching ? 35 : player.height) * (player.y / 600);
@@ -316,12 +316,12 @@ game_code = """
             // Quần trắng
             ctx.fillRect(pX - pW / 2, pYDraw - 20, pW, 20);
 
-            // Tóc đen dài & Nơ hồng xinh xắn trên đầu
+            // Tóc đen dài & Nơ hồng
             ctx.fillStyle = '#111111';
             ctx.beginPath();
             ctx.arc(pX, pYDraw - pH - 10, 15, 0, Math.PI * 2);
             ctx.fill();
-            // Nơ hồng
+            
             ctx.fillStyle = '#ff758c';
             ctx.beginPath();
             ctx.arc(pX - 8, pYDraw - pH - 24, 6, 0, Math.PI * 2);
@@ -330,18 +330,10 @@ game_code = """
             ctx.fillRect(pX - 4, pYDraw - pH - 27, 8, 6);
 
 
-            // --- 2. NGƯỜI ĐUỔI PHÍA SAU (NHÂN VẬT NAM PHONG CÁCH ĐEN - TRẮNG NGẦU) ---
+            // --- 2. NGƯỜI ĐUỔI (NAM PHONG CÁCH ĐEN - TRẮNG NGẦU) ---
             let cX = getLaneX(chaser.lane, chaser.y);
             let cW = chaser.width * (chaser.y / 600);
             let cH = chaser.height * (chaser.y / 600);
 
             ctx.fillStyle = 'rgba(0,0,0,0.4)';
             ctx.beginPath();
-            ctx.ellipse(cX, chaser.y + 5, cW / 2, 10, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Áo phối đen - trắng phong cách
-            ctx.fillStyle = '#1a1a1a';
-            ctx.fillRect(cX - cW / 2, chaser.y - cH + 16, cW / 2, cH - 36);
-            ctx.fillStyle = '#f0f0f0';
-            ctx.fillRect(cX, chaser.y - cH + 16, cW / 2, cH
