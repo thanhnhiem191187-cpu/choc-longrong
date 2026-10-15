@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Roblox vs Muscle Chase 3D", page_icon="🎮", layout="wide")
+st.set_page_config(page_title="Roblox Chase 3D", page_icon="🎮", layout="wide")
 
 st.markdown("""
     <style>
@@ -54,21 +54,14 @@ game_code = """
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Tải hình ảnh Roblox Noob và Đại ca cơ bắp từ nguồn ảnh chất lượng cao
-        const noobImg = new Image();
-        noobImg.src = "https://tr.rbxcdn.com/30DAY-Avatar-Noob-Placeholder/420/420/Image/Png"; // Biểu tượng Roblox Noob
+        // --- TẢI HÌNH ẢNH NHÂN VẬT THỰC TẾ ---
+        // 1. Ảnh người chạy: Roblox Noob (Render trực tiếp từ link icon avatar Roblox)
+        const runnerImg = new Image();
+        runnerImg.src = "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-311D7C2C0EDC956C82F24E68B8D4E302-Png/150/150/AvatarHeadshot/Png/noFilter";
 
-        const muscleImg = new Image();
-        muscleImg.src = "https://img.icons8.com/color/96/muscular-man.png"; // Biểu tượng cơ bắp
-
-        let imagesLoaded = false;
-        let loadedCount = 0;
-        function checkImages() {
-            loadedCount++;
-            if (loadedCount >= 2) imagesLoaded = true;
-        }
-        noobImg.onload = checkImages;
-        muscleImg.onload = checkImages;
+        // 2. Ảnh người đuổi: Anh chàng cơ bắp xăm trổ (Từ hình ảnh bạn cung cấp)
+        const chaserImg = new Image();
+        chaserImg.src = "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=300&auto=format&fit=crop&q=80";
 
         function getLaneX(lane, y) {
             let topCenterX = 400;
@@ -92,8 +85,8 @@ game_code = """
         let player = {
             lane: 1,
             y: 470,
-            width: 45,
-            height: 70,
+            width: 50,
+            height: 75,
             vy: 0,
             jumping: false,
             crouching: false,
@@ -102,9 +95,9 @@ game_code = """
 
         let chaser = {
             lane: 1,
-            y: 540,
-            width: 70,
-            height: 90
+            y: 530,
+            width: 85,
+            height: 105
         };
 
         let obstacles = [];
@@ -156,12 +149,21 @@ game_code = """
             if (frameCount % 45 === 0) {
                 let lane = Math.floor(Math.random() * 3);
                 let type = Math.random() > 0.4 ? "barrier" : "rock";
-                obstacles.push({ lane: lane, y: 140, scale: 0.05, type: type });
+                obstacles.push({
+                    lane: lane,
+                    y: 140,
+                    scale: 0.05,
+                    type: type
+                });
             }
 
             if (frameCount % 30 === 0) {
                 let lane = Math.floor(Math.random() * 3);
-                coins.push({ lane: lane, y: 140, scale: 0.05 });
+                coins.push({
+                    lane: lane,
+                    y: 140,
+                    scale: 0.05
+                });
             }
         }
 
@@ -198,6 +200,7 @@ game_code = """
                         gameOver = true;
                     }
                 }
+
                 if (obs.scale > 1.05) obstacles.splice(i, 1);
             }
 
@@ -227,10 +230,11 @@ game_code = """
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, 800, 140);
 
-            // CON ĐƯỜNG 3D
+            // ĐƯỜNG ĐUA 3D XUYÊN RỪNG
             let roadGradient = ctx.createLinearGradient(0, 140, 0, 600);
             roadGradient.addColorStop(0, '#2b303a');
             roadGradient.addColorStop(1, '#16191f');
+            
             ctx.fillStyle = roadGradient;
             ctx.beginPath();
             ctx.moveTo(400 - 70, 140);
@@ -256,11 +260,12 @@ game_code = """
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // CÂY XUNG QUANH ĐƯỜNG
+            // CÂY RỪNG HAI BÊN
             for (let i = 0; i < 8; i++) {
                 let progress = ((frameCount * 3 + i * 70) % 460) / 460;
                 let y = 140 + progress * 460;
                 let scale = 0.2 + progress * 1.2;
+
                 let leftX = 400 - 90 - progress * 240;
                 let rightX = 400 + 90 + progress * 240;
 
@@ -275,6 +280,7 @@ game_code = """
             coins.forEach(c => {
                 let x = getLaneX(c.lane, c.y);
                 let radius = Math.max(c.scale * 22, 3);
+                
                 ctx.fillStyle = '#ffcc00';
                 ctx.beginPath();
                 ctx.arc(x, c.y, radius, 0, Math.PI * 2);
@@ -289,9 +295,12 @@ game_code = """
                 let x = getLaneX(obs.lane, obs.y);
                 let w = obs.scale * 80;
                 let h = obs.scale * 55;
+                
                 if (obs.type === "barrier") {
                     ctx.fillStyle = '#ff4d6d';
                     ctx.fillRect(x - w / 2, obs.y - h, w, h);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(x - w / 2 + 5, obs.y - h + 5, w - 10, 10);
                 } else {
                     ctx.fillStyle = '#6c757d';
                     ctx.beginPath();
@@ -300,32 +309,26 @@ game_code = """
                 }
             });
 
-            // NHÂN VẬT CHẠY TRỐN (ROBLOX NOOB)
+            // --- VẼ HÌNH ẢNH NHÂN VẬT CHẠY (ROBLOX NOOB) ---
             let pX = getLaneX(player.lane, player.y);
-            let pW = 45 * (player.y / 600);
-            let pH = (player.crouching ? 35 : player.height) * (player.y / 600);
-            let pYDraw = player.crouching ? player.y + 20 : player.y;
+            let pW = 48 * (player.y / 600);
+            let pH = (player.crouching ? 40 : player.height) * (player.y / 600);
+            let pYDraw = player.crouching ? player.y + 25 : player.y;
 
-            if (imagesLoaded) {
-                ctx.drawImage(noobImg, pX - pW / 2, pYDraw - pH, pW, pH);
-            } else {
-                ctx.fillStyle = '#0077b6';
-                ctx.fillRect(pX - pW / 2, pYDraw - pH, pW, pH);
+            if (runnerImg.complete) {
+                ctx.drawImage(runnerImg, pX - pW / 2, pYDraw - pH, pW, pH);
             }
 
-            // NGƯỜI ĐUỔI THEO (ĐẠI CA CƠ BẮP)
+            // --- VẼ HÌNH ẢNH NGƯỜI ĐUỔI (ANH CHÀNG CƠ BẮP XĂM TRỔ) ---
             let cX = getLaneX(chaser.lane, chaser.y);
             let cW = chaser.width * (chaser.y / 600);
             let cH = chaser.height * (chaser.y / 600);
 
-            if (imagesLoaded) {
-                ctx.drawImage(muscleImg, cX - cW / 2, chaser.y - cH, cW, cH);
-            } else {
-                ctx.fillStyle = '#d4a373';
-                ctx.fillRect(cX - cW / 2, chaser.y - cH, cW, cH);
+            if (chaserImg.complete) {
+                ctx.drawImage(chaserImg, cX - cW / 2, chaser.y - cH, cW, cH);
             }
 
-            // HUD ĐIỂM SỐ
+            // BẢNG ĐIỂM HUD
             ctx.fillStyle = 'rgba(0,0,0,0.6)';
             ctx.roundRect(15, 15, 190, 80, 10);
             ctx.fill();
@@ -344,7 +347,7 @@ game_code = """
                 ctx.fillStyle = '#ff007f';
                 ctx.font = 'bold 36px "Segoe UI", Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('NOOB ĐÃ BỊ BẮT! 💥', 400, 250);
+                ctx.fillText('ĐẠI CA ĐÃ BẮT ĐƯỢC NOOB! 💥', 400, 250);
 
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '20px "Segoe UI", Arial';
